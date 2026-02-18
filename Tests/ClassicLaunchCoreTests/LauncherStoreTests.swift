@@ -83,6 +83,23 @@ final class LauncherStoreTests: XCTestCase {
     }
 
     @MainActor
+    func testBootstrapRunsOnceWhenCalledRepeatedly() {
+        let indexer = CountingMockIndexer(apps: [
+            InstalledApp(id: "a", name: "Alpha", bundleIdentifier: nil, path: "/Applications/Alpha.app", isSystemApp: false)
+        ])
+
+        let store = LauncherStore(
+            indexer: indexer,
+            persistence: InMemoryPersistence(state: nil)
+        )
+
+        store.bootstrap()
+        store.bootstrap()
+
+        XCTAssertEqual(indexer.scanCount, 1)
+    }
+
+    @MainActor
     func testHandleDropAppIntoFolder() {
         let apps = [
             InstalledApp(id: "a", name: "Alpha", bundleIdentifier: nil, path: "/Applications/Alpha.app", isSystemApp: false),
@@ -123,6 +140,20 @@ private final class MockIndexer: AppIndexing {
 
     func scanInstalledApps() throws -> [InstalledApp] {
         apps
+    }
+}
+
+private final class CountingMockIndexer: AppIndexing {
+    let apps: [InstalledApp]
+    private(set) var scanCount: Int = 0
+
+    init(apps: [InstalledApp]) {
+        self.apps = apps
+    }
+
+    func scanInstalledApps() throws -> [InstalledApp] {
+        scanCount += 1
+        return apps
     }
 }
 

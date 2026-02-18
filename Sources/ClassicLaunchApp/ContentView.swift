@@ -229,7 +229,7 @@ struct ContentView: View {
 
             Spacer()
 
-            Text(editingMode ? "편집 모드: 앱 드래그로 재정렬, 앱→폴더 드롭으로 폴더에 추가" : "일반 모드: 클릭 즉시 실행")
+            Text(editingMode ? "편집 모드: 앱 드래그로 재정렬, 앱→폴더 드롭으로 폴더에 추가" : "일반 모드: 클릭 즉시 실행 · 전역 토글 ⌥⌘L")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.65))
         }

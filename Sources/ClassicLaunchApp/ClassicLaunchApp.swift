@@ -3,6 +3,8 @@ import SwiftUI
 
 @main
 struct ClassicLaunchApp: App {
+    @NSApplicationDelegateAdaptor(ClassicLaunchAppDelegate.self) private var appDelegate
+
     @StateObject private var store = LauncherStore(
         indexer: DefaultAppIndexer(),
         persistence: FileLauncherStatePersistence.default(),
@@ -14,6 +16,7 @@ struct ClassicLaunchApp: App {
             ContentView(store: store)
                 .frame(minWidth: 980, minHeight: 700)
                 .onAppear {
+                    AppWindowController.bindMainWindowIfNeeded()
                     store.bootstrap()
                 }
         }
@@ -21,6 +24,13 @@ struct ClassicLaunchApp: App {
 
         Commands {
             CommandMenu("ClassicLaunch") {
+                Button("런처 토글") {
+                    Task { @MainActor in
+                        AppWindowController.toggleMainWindow()
+                    }
+                }
+                .keyboardShortcut("l", modifiers: [.command, .option])
+
                 Button("앱 목록 새로고침") {
                     store.reloadApps()
                 }

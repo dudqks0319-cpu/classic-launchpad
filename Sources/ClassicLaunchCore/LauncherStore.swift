@@ -3,7 +3,11 @@ import Foundation
 
 @MainActor
 public final class LauncherStore: ObservableObject {
-    @Published public private(set) var installedApps: [InstalledApp] = []
+    @Published public private(set) var installedApps: [InstalledApp] = [] {
+        didSet {
+            installedAppsByIDCache = Dictionary(uniqueKeysWithValues: installedApps.map { ($0.id, $0) })
+        }
+    }
     @Published public private(set) var state: LauncherState = .empty
     @Published public var searchQuery: String = ""
     @Published public private(set) var lastSyncDate: Date?
@@ -13,6 +17,9 @@ public final class LauncherStore: ObservableObject {
 
     private let indexer: AppIndexing
     private let persistence: LauncherStatePersisting
+
+    private var installedAppsByIDCache: [String: InstalledApp] = [:]
+    private var didBootstrap = false
 
     public init(
         indexer: AppIndexing,
@@ -25,6 +32,9 @@ public final class LauncherStore: ObservableObject {
     }
 
     public func bootstrap() {
+        guard !didBootstrap else { return }
+        didBootstrap = true
+
         do {
             if let loaded = try persistence.loadState() {
                 state = loaded
@@ -53,7 +63,7 @@ public final class LauncherStore: ObservableObject {
     }
 
     public var installedAppsByID: [String: InstalledApp] {
-        Dictionary(uniqueKeysWithValues: installedApps.map { ($0.id, $0) })
+        installedAppsByIDCache
     }
 
     public var topLevelEntries: [DisplayEntry] {

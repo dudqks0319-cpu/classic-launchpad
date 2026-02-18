@@ -16,8 +16,9 @@
 - [ ] 대량 앱(500+) 성능 프로파일링
 
 ## P2 (App Store 고도화)
-- [ ] 완전한 Xcode 프로젝트 전환
-- [ ] 샌드박스/Entitlements 확정
+- [x] XcodeGen 기반 .xcodeproj 생성 경로 마련 (`project.yml` + 스크립트)
+- [x] 샌드박스/Entitlements 기본값 반영
+- [x] App Store 메타데이터 초안 작성
 - [ ] 접근성(VoiceOver) 강화
 - [ ] 크래시 리포트/진단 로그 체계
-- [ ] App Store 메타데이터/스크린샷 패키지
+- [ ] 실제 심사 제출용 스크린샷 패키지 제작

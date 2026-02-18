@@ -13,8 +13,10 @@ macOS 업그레이드 이후 Launchpad가 사라져 불편한 사용자를 위�
   - 앱 → 폴더 드롭으로 폴더에 앱 추가
   - 앱 → 앱 드롭으로 새 폴더 생성
 - ✅ 앱 실행 (클릭)
+- ✅ 전역 런처 토글 단축키 (`⌥⌘L`)
 - ✅ 로컬 JSON 상태 저장 (`~/Library/Application Support/ClassicLaunch/launcher-state.json`)
 - ✅ 로컬 처리 프라이버시 문구 제공
+- ✅ 부팅 중복 로딩 방지 + 앱 ID 캐시(초기 렌더 성능 개선)
 
 ## 제품 방향 (요청 반영)
 
@@ -47,7 +49,17 @@ swift build
 swift run ClassicLaunch
 ```
 
-> 현재는 Swift Package 기반 소스 구조입니다. 실제 App Store 제출은 Xcode 프로젝트(.xcodeproj)로 래핑해 서명/노타리제이션/심사를 진행하는 것을 권장합니다.
+> 현재는 Swift Package 기반 소스 구조이며, App Store 아카이브를 위해 `project.yml`(XcodeGen)도 함께 제공합니다.
+
+## Xcode 프로젝트 생성 (App Store용)
+
+```bash
+cd classic-launchpad
+brew install xcodegen
+./scripts/generate_xcodeproj.sh
+```
+
+생성 결과: `ClassicLaunch.xcodeproj`
 
 ## 테스트
 
@@ -70,3 +82,4 @@ swift test
 2. `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
 3. `sudo xcodebuild -runFirstLaunch`
 4. 필요 시 `xcode-select --install`로 CLT 재설치
+5. 점검 스크립트 실행: `./scripts/check_xcode_toolchain.sh`

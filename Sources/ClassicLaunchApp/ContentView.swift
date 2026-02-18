@@ -284,7 +284,7 @@ struct ContentView: View {
             .onDrag {
                 NSItemProvider(object: NSString(string: entry.id))
             }
-            .onDrop(of: [UTType.plainText], delegate: EntryDropDelegate(targetID: entry.id, store: store))
+            .onDrop(of: [UTType.plainText], delegate: EntryDropDelegate(targetID: entry.id, store: store, isEditingMode: editingMode))
             .contextMenu {
                 appContextMenu(app)
             }
@@ -296,7 +296,7 @@ struct ContentView: View {
             .onDrag {
                 NSItemProvider(object: NSString(string: entry.id))
             }
-            .onDrop(of: [UTType.plainText], delegate: EntryDropDelegate(targetID: entry.id, store: store))
+            .onDrop(of: [UTType.plainText], delegate: EntryDropDelegate(targetID: entry.id, store: store, isEditingMode: editingMode))
             .contextMenu {
                 folderContextMenu(folder)
             }

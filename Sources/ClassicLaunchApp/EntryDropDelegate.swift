@@ -6,8 +6,10 @@ import UniformTypeIdentifiers
 struct EntryDropDelegate: DropDelegate {
     let targetID: String
     let store: LauncherStore
+    let isEditingMode: Bool
 
     func performDrop(info: DropInfo) -> Bool {
+        guard isEditingMode else { return false }
         guard let provider = info.itemProviders(for: [UTType.plainText]).first else { return false }
 
         provider.loadDataRepresentation(forTypeIdentifier: UTType.plainText.identifier) { data, _ in

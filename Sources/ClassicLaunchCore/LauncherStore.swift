@@ -141,14 +141,34 @@ public final class LauncherStore: ObservableObject {
         let uniqueIDs = deduplicated(appIDs).filter { installedAppsByID[$0] != nil }
         guard uniqueIDs.count >= 2 else { return }
 
-        let insertionIndex = uniqueIDs
+        let topLevelOrder: [String: Int] = Dictionary(uniqueKeysWithValues: state.orderedEntries.enumerated().compactMap { index, entry in
+            if case .app(let appID) = entry {
+                return (appID, index)
+            }
+            return nil
+        })
+
+        let originalOrder: [String: Int] = Dictionary(uniqueKeysWithValues: uniqueIDs.enumerated().map { ($1, $0) })
+
+        let orderedIDs = uniqueIDs.sorted { lhs, rhs in
+            let lhsTopLevelIndex = topLevelOrder[lhs] ?? Int.max
+            let rhsTopLevelIndex = topLevelOrder[rhs] ?? Int.max
+
+            if lhsTopLevelIndex == rhsTopLevelIndex {
+                return (originalOrder[lhs] ?? 0) < (originalOrder[rhs] ?? 0)
+            }
+
+            return lhsTopLevelIndex < rhsTopLevelIndex
+        }
+
+        let insertionIndex = orderedIDs
             .compactMap { id in state.orderedEntries.firstIndex(of: .app(id)) }
             .min() ?? state.orderedEntries.count
 
         // 기존 배치에서 제거
-        removeAppsFromCurrentPlacement(uniqueIDs)
+        removeAppsFromCurrentPlacement(orderedIDs)
 
-        let folder = LauncherFolder(name: name, appIDs: uniqueIDs)
+        let folder = LauncherFolder(name: name, appIDs: orderedIDs)
         state.folders[folder.id] = folder
 
         state.orderedEntries.insert(.folder(folder.id), at: min(insertionIndex, state.orderedEntries.count))

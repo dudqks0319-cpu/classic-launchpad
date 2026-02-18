@@ -58,6 +58,34 @@ final class LauncherStoreTests: XCTestCase {
     }
 
     @MainActor
+    func testCreateFolderNormalizesSelectedOrderByTopLevelPlacement() {
+        let apps = [
+            InstalledApp(id: "a", name: "Alpha", bundleIdentifier: nil, path: "/Applications/Alpha.app", isSystemApp: false),
+            InstalledApp(id: "b", name: "Bravo", bundleIdentifier: nil, path: "/Applications/Bravo.app", isSystemApp: false),
+            InstalledApp(id: "c", name: "Charlie", bundleIdentifier: nil, path: "/Applications/Charlie.app", isSystemApp: false)
+        ]
+
+        let persisted = LauncherState(
+            orderedEntries: [.app("a"), .app("b"), .app("c")]
+        )
+
+        let store = LauncherStore(
+            indexer: MockIndexer(apps: apps),
+            persistence: InMemoryPersistence(state: persisted)
+        )
+
+        store.bootstrap()
+        store.createFolder(name: "묶음", appIDs: ["c", "a"])
+
+        guard case .folder(let folder) = store.topLevelEntries.first else {
+            return XCTFail("Expected folder entry")
+        }
+
+        XCTAssertEqual(folder.apps.map(\.id), ["a", "c"])
+        XCTAssertEqual(store.topLevelEntries.map(\.title), ["묶음", "Bravo"])
+    }
+
+    @MainActor
     func testRemoveAppFromFolderCollapsesFolderWhenNeeded() {
         let apps = [
             InstalledApp(id: "a", name: "Alpha", bundleIdentifier: nil, path: "/Applications/Alpha.app", isSystemApp: false),
